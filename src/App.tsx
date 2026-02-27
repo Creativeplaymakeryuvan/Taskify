@@ -1,5 +1,8 @@
-import React from 'react';
-import Aliases from './Study/Aliases.tsx';
+import React, { useState } from 'react';
+// import Aliases from './Study/Aliases.tsx';
+import './App.css';
+import InputFeild from './Components/InputFeild.tsx';
+import type { Todo } from './model.ts';
 
 const App: React.FC = () => {
 
@@ -36,14 +39,31 @@ const App: React.FC = () => {
   // }
 
   // let nevrerReturns: () => Number// Function with never return type
+
+  const [todo, setTodo] = useState<string>("")
+  const [todos, setTodos] = useState<Todo[]>([])
+
+
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setTodos([...todos, { id: Date.now(), todo, isDone: false }])
+    setTodo("");
+  }
+
+  console.log(todo);
+  console.log(todos);
+  
   
 
   return (
-    <div className='app-container'>
+    <div className='App'>
       {/* <h1>Hello {name}</h1> */}
       {/* <Aliases /> */}
 
-      <span className="heading"></span>
+      <span className="heading">Taskify</span>
+      <InputFeild todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
     </div>
   );
 }

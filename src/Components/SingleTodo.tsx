@@ -2,15 +2,12 @@ import React, { useState } from 'react'
 import type { Todo } from '../model'
 import { MdModeEdit, MdDelete, MdOutlineDone } from "react-icons/md";
 import './styles.css';
-import TodoList from './TodoList';
 
 interface Props {
     todo: Todo,
     todos: Todo[],
     setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
 }
-
-
 
 
 const SingleTodo = ({ todo, todos, setTodos }: Props) => {
@@ -72,7 +69,6 @@ const SingleTodo = ({ todo, todos, setTodos }: Props) => {
                     }
                 }
                 }
-
                 >
 
                     <MdModeEdit />

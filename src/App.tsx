@@ -4,6 +4,7 @@ import './App.css';
 import InputFeild from './Components/InputFeild.tsx';
 import type { Todo } from './model.ts';
 import TodoList from './Components/TodoList.tsx';
+import { DragDropContext, type DropResult } from '@hello-pangea/dnd';
 
 const App: React.FC = () => {
 
@@ -42,7 +43,8 @@ const App: React.FC = () => {
   // let nevrerReturns: () => Number// Function with never return type
 
   const [todo, setTodo] = useState<string>("")
-  const [todos, setTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Array<Todo>>([])
+  const [completedTodos, setCompletedTodos] = useState<Array<Todo>>([]);
 
 
 
@@ -55,18 +57,57 @@ const App: React.FC = () => {
 
   console.log(todo);
   console.log(todos);
-  
-  
+
+ const onDragEnd = (result: DropResult) => {
+    const { destination, source } = result;
+
+    console.log(result);
+
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    let add;
+    let active = todos;
+    let complete = completedTodos;
+    // Source Logic
+    if (source.droppableId === "TodosList") {
+      add = active[source.index];
+      active.splice(source.index, 1);
+    } else {
+      add = complete[source.index];
+      complete.splice(source.index, 1);
+    }
+
+    // Destination Logic
+    if (destination.droppableId === "TodosList") {
+      active.splice(destination.index, 0, add);
+    } else {
+      complete.splice(destination.index, 0, add);
+    }
+
+    setCompletedTodos(complete);
+    setTodos(active);
+  };
 
   return (
-    <div className='App'>
-      {/* <h1>Hello {name}</h1> */}
-      {/* <Aliases /> */}
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className='App'>
+        {/* <h1>Hello {name}</h1> */}
+        {/* <Aliases /> */}
 
-      <span className="heading">Taskify</span>
-      <InputFeild todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
-      <TodoList todos={todos} setTodos={setTodos} />
-    </div>
+        <span className="heading">Taskify</span>
+        <InputFeild todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
+        <TodoList todos={todos} setTodos={setTodos} completedTodos={completedTodos} setCompletedTodos={setCompletedTodos} />
+      </div>
+    </DragDropContext>
   );
 }
 

@@ -2,15 +2,17 @@ import React, { useState } from 'react'
 import type { Todo } from '../model'
 import { MdModeEdit, MdDelete, MdOutlineDone } from "react-icons/md";
 import './styles.css';
+import { Draggable } from '@hello-pangea/dnd';
 
 interface Props {
+    index: number,
     todo: Todo,
     todos: Todo[],
     setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
 }
 
 
-const SingleTodo = ({ todo, todos, setTodos }: Props) => {
+const SingleTodo = ({ index, todo, todos, setTodos }: Props) => {
 
     const [edit, setEdit] = useState<boolean>(false);
     const [editTodo, setEditTodo] = useState<string>(todo.todo);
@@ -40,43 +42,55 @@ const SingleTodo = ({ todo, todos, setTodos }: Props) => {
     }, [edit]);
 
     return (
-        <form className='todos_single' onSubmit={(e) => handleEdit(e, todo.id)}>
-
+        <Draggable draggableId={todo.id.toString()} index={index}>
             {
-                edit ? (
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        value={editTodo}
-                        onChange={(e) => setEditTodo(e.target.value)}
-                        className='todos_single_text' />
+                ( provided, snapshot ) => (
+                    <form 
+                        className={`todos_single ${snapshot.isDragging ? 'drag' : ''}`}
+                        onSubmit={(e) => handleEdit(e, todo.id)}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                    >   
 
-                ) : (
-                    todo.isDone ? (
-                        <s className="todos_single--text">{todo.todo}</s>
-                    ) : (
-                        <span className='todos_single--text'>{todo.todo}</span>
-                    )
+                        {
+                            edit ? (
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={editTodo}
+                                    onChange={(e) => setEditTodo(e.target.value)}
+                                    className='todos_single_text' />
+
+                            ) : (
+                                todo.isDone ? (
+                                    <s className="todos_single--text">{todo.todo}</s>
+                                ) : (
+                                    <span className='todos_single--text'>{todo.todo}</span>
+                                )
+                            )
+                        }
+
+
+
+                        <div>
+                            <span className='icon' onClick={() => {
+                                if (!edit && !todo.isDone) {
+                                    setEdit(!edit)
+                                }
+                            }
+                            }
+                            >
+
+                                <MdModeEdit />
+                            </span>
+                            <span className='icon'><MdDelete onClick={() => handleDelete(todo.id)} /></span>
+                            <span className='icon'><MdOutlineDone onClick={() => handleDone(todo.id)} /></span>
+                        </div>
+                    </form>
                 )
             }
-
-
-
-            <div>
-                <span className='icon' onClick={() => {
-                    if (!edit && !todo.isDone) {
-                        setEdit(!edit)
-                    }
-                }
-                }
-                >
-
-                    <MdModeEdit />
-                </span>
-                <span className='icon'><MdDelete onClick={() => handleDelete(todo.id)} /></span>
-                <span className='icon'><MdOutlineDone onClick={() => handleDone(todo.id)} /></span>
-            </div>
-        </form>
+        </Draggable>
     )
 }
 
